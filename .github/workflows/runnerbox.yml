@@ -8,6 +8,12 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 350
     steps:
+      - name: Probe for foldable device types
+        run: |
+          xcrun simctl list devicetypes | grep -i "duo\|fold" || echo "no foldable devicetypes"
+          xcrun simctl list runtimes | grep -i ios || true
+          xcodebuild -version
+
       - name: RunnerBox agent
         uses: TouchTechClub/runner@v1
         with:
