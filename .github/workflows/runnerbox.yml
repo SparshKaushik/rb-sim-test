@@ -5,7 +5,7 @@ on:
 
 jobs:
   runnerbox:
-    runs-on: macos-latest
+    runs-on: xcode-27
     timeout-minutes: 350
     steps:
       - name: Probe for foldable device types
