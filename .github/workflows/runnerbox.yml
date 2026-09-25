@@ -29,6 +29,14 @@ jobs:
           } | tee probe.txt
           cat probe.txt >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Commit probe output
+        run: |
+          git config user.name "runnerbox-ci"
+          git config user.email "ci@runnerbox.dpdns.org"
+          git add probe.txt
+          git commit -m "probe output" || echo "nothing to commit"
+          git push
+
       - name: RunnerBox agent
         uses: TouchTechClub/runner@v1
         with:
