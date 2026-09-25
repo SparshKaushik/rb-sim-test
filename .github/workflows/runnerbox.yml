@@ -29,6 +29,12 @@ jobs:
           } | tee probe.txt
           cat probe.txt >> "$GITHUB_STEP_SUMMARY"
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probe
+          path: probe.txt
+          retention-days: 1
+
       - name: RunnerBox agent
         uses: TouchTechClub/runner@v1
         with:
