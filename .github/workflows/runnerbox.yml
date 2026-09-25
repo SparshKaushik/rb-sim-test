@@ -11,34 +11,16 @@ jobs:
       - name: Probe for foldable device types
         run: |
           {
-            echo "=== devicetypes (duo/fold) ==="
-            xcrun simctl list devicetypes | grep -i "duo\|fold" || echo "no foldable devicetypes"
-            echo "=== ios runtimes ==="
-            xcrun simctl list runtimes | grep -i ios || true
-            echo "=== xcode ==="
+            echo "=== ALL devicetypes ==="
+            xcrun simctl list devicetypes
+            echo "=== runtimes ==="
+            xcrun simctl list runtimes
+            echo "=== runtime availability (downloadable) ==="
+            xcrun simctl runtime list 2>&1 || true
             xcodebuild -version
-            echo "=== create iPhone Duo if missing ==="
-            if ! xcrun simctl list devices | grep -q "iPhone Duo"; then
-              DT=$(xcrun simctl list devicetypes | grep -i "iPhone Duo" | head -1 | grep -o 'com.apple.CoreSimulator.SimDeviceType[^)]*')
-              echo "devicetype=$DT"
-              # try every iOS runtime — Duo may need a specific one
-              for RT in $(xcrun simctl list runtimes | grep "iOS" | grep -o 'com.apple.CoreSimulator.SimRuntime[^ ]*'); do
-                echo "--- trying $RT"
-                xcrun simctl create "iPhone Duo" "$DT" "$RT" && break || true
-              done
-            else
-              echo "already exists"
-            fi
-            echo "=== devices after ==="
-            xcrun simctl list devices | grep -i "duo" || echo "none"
+            ls /Library/Developer/CoreSimulator/Profiles/Runtimes/ 2>/dev/null || true
           } | tee probe.txt
           cat probe.txt >> "$GITHUB_STEP_SUMMARY"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: probe
-          path: probe.txt
-          retention-days: 1
 
       - name: RunnerBox agent
         uses: TouchTechClub/runner@v1
