@@ -17,6 +17,15 @@ jobs:
             xcrun simctl list runtimes | grep -i ios || true
             echo "=== xcode ==="
             xcodebuild -version
+            echo "=== create iPhone Duo if missing ==="
+            if ! xcrun simctl list devices | grep -q "iPhone Duo"; then
+              DT=$(xcrun simctl list devicetypes | grep -i "iPhone Duo" | head -1 | grep -o 'com.apple.CoreSimulator.SimDeviceType[^ ]*')
+              RT=$(xcrun simctl list runtimes | grep "iOS" | tail -1 | grep -o 'com.apple.CoreSimulator.SimRuntime[^ ]*')
+              echo "devicetype=$DT runtime=$RT"
+              xcrun simctl create "iPhone Duo" "$DT" "$RT" && echo "created" || echo "create failed"
+            else
+              echo "already exists"
+            fi
           } | tee probe.txt
           cat probe.txt >> "$GITHUB_STEP_SUMMARY"
 
