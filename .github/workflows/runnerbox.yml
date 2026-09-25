@@ -20,12 +20,17 @@ jobs:
             echo "=== create iPhone Duo if missing ==="
             if ! xcrun simctl list devices | grep -q "iPhone Duo"; then
               DT=$(xcrun simctl list devicetypes | grep -i "iPhone Duo" | head -1 | grep -o 'com.apple.CoreSimulator.SimDeviceType[^)]*')
-              RT=$(xcrun simctl list runtimes | grep "iOS" | tail -1 | grep -o 'com.apple.CoreSimulator.SimRuntime[^ ]*')
-              echo "devicetype=$DT runtime=$RT"
-              xcrun simctl create "iPhone Duo" "$DT" "$RT" && echo "created" || echo "create failed"
+              echo "devicetype=$DT"
+              # try every iOS runtime — Duo may need a specific one
+              for RT in $(xcrun simctl list runtimes | grep "iOS" | grep -o 'com.apple.CoreSimulator.SimRuntime[^ ]*'); do
+                echo "--- trying $RT"
+                xcrun simctl create "iPhone Duo" "$DT" "$RT" && break || true
+              done
             else
               echo "already exists"
             fi
+            echo "=== devices after ==="
+            xcrun simctl list devices | grep -i "duo" || echo "none"
           } | tee probe.txt
           cat probe.txt >> "$GITHUB_STEP_SUMMARY"
 
