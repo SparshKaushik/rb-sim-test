@@ -5,7 +5,7 @@ on:
 
 jobs:
   simbox:
-    runs-on: xcode-27
+    runs-on: macos-latest
     timeout-minutes: 350
     steps:
       - name: Simbox agent
