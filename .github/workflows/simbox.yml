@@ -1,0 +1,14 @@
+name: simbox
+
+on:
+  workflow_dispatch:
+
+jobs:
+  simbox:
+    runs-on: xcode-27
+    timeout-minutes: 350
+    steps:
+      - name: Simbox agent
+        uses: TouchTechClub/runner@v1
+        with:
+          token: ${{ secrets.SIMBOX_TOKEN }}
