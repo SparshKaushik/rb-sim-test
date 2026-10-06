@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: 6f682ca29aa839ee37f4cf8eaadccb588fbb315d
+          ref: dc4bfc750105b1c2e15108443d1ca4d8e7ecfbae
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: '1.3.14'
@@ -21,7 +21,7 @@ jobs:
         env:
           DEVICE_PLATFORM: ${{ inputs.platform }}
         run: |
-          echo '4e72740757b8555ab0c09f0807dcb54567e49f6be1aac711fd95c2dfc9360c33  .simbox-verification/agent.mjs' | shasum -a 256 -c -
+          echo 'ba2d7dae0e06a68b31b762179dcf296ecf63f06c6e716a4c3fdc6eac274bf167  .simbox-verification/agent.mjs' | shasum -a 256 -c -
           uname -sm
           if [ "$DEVICE_PLATFORM" = android ]; then
             test -e /dev/kvm
