@@ -1,4 +1,5 @@
 name: simbox
+
 on:
   workflow_dispatch:
     inputs:
@@ -6,31 +7,19 @@ on:
         type: choice
         options: [ios, android]
         default: ios
+        description: Device platform (Android uses Linux/KVM)
+
 jobs:
   simbox:
     runs-on: ${{ inputs.platform == 'android' && 'ubuntu-latest' || 'macos-latest' }}
-    timeout-minutes: 45
+    timeout-minutes: 350
     steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: 17894ceb34ae54208827d02ed1c64f0f8c86ce20
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: '1.3.14'
-      - name: Verify source and runner capability
-        env:
-          DEVICE_PLATFORM: ${{ inputs.platform }}
+      - name: Enable Android KVM access
+        if: ${{ inputs.platform == 'android' }}
         run: |
-          echo 'c8cd262945c7da24c677413377bdec505829dd5624d8dfd03c870360991991f9  .simbox-verification/agent.mjs' | shasum -a 256 -c -
-          uname -sm
-          if [ "$DEVICE_PLATFORM" = android ]; then
-            test -e /dev/kvm
-            sudo chmod 666 /dev/kvm
-          else
-            xcrun --find simctl
-          fi
-      - name: Unreleased Simbox preview verification agent
-        env:
-          SIMBOX_TOKEN: ${{ secrets.SIMBOX_TOKEN }}
-          SIMBOX_API_URL: https://api.simbox.touchtech.club
-        run: bun .simbox-verification/agent.mjs
+          test -e /dev/kvm || { echo "KVM is required for Android" >&2; exit 1; }
+          sudo chmod 666 /dev/kvm
+      - name: Simbox agent
+        uses: TouchTechClub/runner@v1
+        with:
+          token: ${{ secrets.SIMBOX_TOKEN }}
